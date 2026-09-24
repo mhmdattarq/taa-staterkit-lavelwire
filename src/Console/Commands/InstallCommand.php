@@ -26,8 +26,20 @@ class InstallCommand extends Command
         File::copy($stubPath . '/.cursorrules', base_path('.cursorrules'));
         File::copy($stubPath . '/.cursorignore', base_path('.cursorignore'));
 
+        // 3. Tambahkan ke .gitignore agar docs dan rules tidak ter-push ke production
+        $gitignorePath = base_path('.gitignore');
+        if (File::exists($gitignorePath)) {
+            $currentContent = File::get($gitignorePath);
+            if (!str_contains($currentContent, '.docs/')) {
+                $ignoreRules = "\n# TAA Agentic Workspace (Local Dev Only)\n.docs/\nagents/\n.cursorrules\n.cursorignore\n";
+                File::append($gitignorePath, $ignoreRules);
+                $this->info('✔ .docs/, agents/, and rules appended to .gitignore.');
+            }
+        }
+
         $this->info('✔ agents/ and .docs/ installed successfully.');
         $this->info('✔ .cursorrules and .cursorignore placed at project root.');
-        $this->newLine();$this->info('🚀 TAA Starterkit ready for vibe-coding!');
+        $this->newLine();
+        $this->info('mhmdattaq Starterkit ready for make-somemoney!🚀');
     }
 }
