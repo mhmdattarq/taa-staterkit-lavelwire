@@ -1,4 +1,4 @@
-# TAA Starterkit (Laravel Livewire + Yajra DataTables)
+# taa-Starterkit (Laravel Livewire + Yajra DataTables)
 
 Automated Agentic Workspace installer for Laravel projects optimized for VS Code (Antigravity/Copilot) and Cursor.
 
