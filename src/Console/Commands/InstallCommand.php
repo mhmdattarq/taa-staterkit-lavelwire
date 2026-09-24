@@ -32,23 +32,39 @@ class InstallCommand extends Command
             File::copyDirectory($stubPath . '/.github', base_path('.github'));
         }
 
-        // 3. Inject / Update .gitignore secara bersih dan tegas
+        // 3. Inject / Update .gitignore baris per baris secara pasti
         $gitignorePath = base_path('.gitignore');
         if (File::exists($gitignorePath)) {
-            $content = File::get($gitignorePath);
+            $lines = file($gitignorePath, FILE_IGNORE_NEW_LINES);
 
-            // Bersihkan blok TAA lama (baik format titik maupun leading slash)
-            $cleaned = preg_replace('/# TAA Agentic Workspace.*?(\n\s*)*$/s', '', $content);
-            $cleaned = preg_replace('/# TAA Agentic Workspace.*?(?=\n[#\/a-zA-Z0-9_\-\*\.]|$)/s', '', $cleaned);
-            $cleaned = rtrim($cleaned);
+            // Filter dan buang semua entri TAA lama jika sudah ada
+            $filteredLines = array_filter($lines, function ($line) {
+                $trimmed = trim($line);
+                return !in_array($trimmed, [
+                    '# TAA Agentic Workspace (Local Dev Only)',
+                    '.docs/',
+                    '/.docs/',
+                    'agents/',
+                    '/agents/',
+                    '.agents/',
+                    '/.agents/',
+                    '.cursorrules',
+                    '/.cursorrules',
+                    '.cursorignore',
+                    '/.cursorignore',
+                    '.github/copilot-instructions.md',
+                    '/.github/copilot-instructions.md',
+                ]);
+            });
 
-            $rules = "\n\n# TAA Agentic Workspace (Local Dev Only)\n/.docs/\n/agents/\n/.agents/\n/.cursorrules\n/.cursorignore\n/.github/copilot-instructions.md\n";
+            $cleanContent = rtrim(implode("\n", $filteredLines));
+            $newRules = "\n\n# TAA Agentic Workspace (Local Dev Only)\n/.docs/\n/agents/\n/.agents/\n/.cursorrules\n/.cursorignore\n/.github/copilot-instructions.md\n";
 
-            File::put($gitignorePath, $cleaned . $rules);
-            $this->info('✔ Workspace rules automatically secured in .gitignore.');
+            File::put($gitignorePath, $cleanContent . $newRules);
+            $this->info('✔ .gitignore updated with strict root paths.');
         }
 
-        // 4. Bersihkan Git tracking cache per item agar tidak abort jika salah satu item belum ter-track
+        // 4. Bersihkan Git tracking cache agar langsung redup di VS Code
         if (File::exists(base_path('.git'))) {
             $items = ['.docs', 'agents', '.agents', '.cursorrules', '.cursorignore', '.github/copilot-instructions.md'];
             foreach ($items as $item) {
