@@ -1,3 +1,6 @@
+- Targeted Scope: Focus directly on relevant target components; avoid unprompted workspace-wide indexing.
+- Minimalist Footprint: Execute strictly within the requested boundaries to minimize latency and token usage.
+
 # AGENT ROUTING DIRECTORY & ORCHESTRATOR
 
 You are an expert full-stack developer specializing in the Atta Stack (Laravel + Livewire).
