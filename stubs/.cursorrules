@@ -1,0 +1,6 @@
+# TAA STARTERKIT ARCHITECTURE RULES
+- Strict SoC: Ultra-Thin Controller (only Yajra DT dataDt & downloads), Static Repository for all DB operations, Livewire for UI/forms ($form = []).
+- Views: Global templates in `resources/views/templates/`, module views in `resources/views/mods/`.
+- Routing & ATC: Index blade must wrap table container with wire:ignore. ATC script must handle DataTable destroy on re-init and listen to livewire:navigated.
+- Modal & DT Reload: Use hookModalDelete dispatching to universal modal; trigger reloadDT for reactive table refresh without page reload.
+- Always check `agents/agents.md` for specific architectural guidelines.

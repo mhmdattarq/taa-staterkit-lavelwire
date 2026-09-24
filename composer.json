@@ -1,0 +1,18 @@
+{
+    "name": "atta/taa-staterkit-lavelwire",
+    "description": "Agentic workspace starter kit for Laravel Livewire",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "TaaStarter\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TaaStarter\\TaaStarterServiceProvider"
+            ]
+        }
+    }
+}
