@@ -32,42 +32,28 @@ class InstallCommand extends Command
             File::copyDirectory($stubPath . '/.github', base_path('.github'));
         }
 
-        // 3. Inject ke .gitignore otomatis dengan format root path lengkap
+        // 3. Inject / Update .gitignore secara bersih dan tegas
         $gitignorePath = base_path('.gitignore');
         if (File::exists($gitignorePath)) {
-            $currentContent = File::get($gitignorePath);
+            $content = File::get($gitignorePath);
 
-            // Bersihkan entri lama jika formatnya belum pakai leading slash
-            if (str_contains($currentContent, '# TAA Agentic Workspace')) {
-                $cleanedContent = preg_replace('/# TAA Agentic Workspace.*?(?=(\n\n|\Z))/s', '', $currentContent);
-                File::put($gitignorePath, trim($cleanedContent));
-                $currentContent = File::get($gitignorePath);
-            }
+            // Bersihkan blok TAA lama (baik format titik maupun leading slash)
+            $cleaned = preg_replace('/# TAA Agentic Workspace.*?(\n\s*)*$/s', '', $content);
+            $cleaned = preg_replace('/# TAA Agentic Workspace.*?(?=\n[#\/a-zA-Z0-9_\-\*\.]|$)/s', '', $cleaned);
+            $cleaned = rtrim($cleaned);
 
-            if (!str_contains($currentContent, '/.docs/')) {
-                $ignoreRules = "\n\n# TAA Agentic Workspace (Local Dev Only)\n/.docs/\n/agents/\n/.agents/\n/.cursorrules\n/.cursorignore\n/.github/copilot-instructions.md\n";
-                File::append($gitignorePath, $ignoreRules);
-                $this->info('✔ Workspace rules automatically secured in .gitignore.');
-            }
+            $rules = "\n\n# TAA Agentic Workspace (Local Dev Only)\n/.docs/\n/agents/\n/.agents/\n/.cursorrules\n/.cursorignore\n/.github/copilot-instructions.md\n";
+
+            File::put($gitignorePath, $cleaned . $rules);
+            $this->info('✔ Workspace rules automatically secured in .gitignore.');
         }
 
-        // 4. Otomatis lepas cache git agar file langsung redup (ignored) tanpa command manual
+        // 4. Bersihkan Git tracking cache per item agar tidak abort jika salah satu item belum ter-track
         if (File::exists(base_path('.git'))) {
-            $process = new Process([
-                'git',
-                'rm',
-                '-r',
-                '--cached',
-                '.docs',
-                'agents',
-                '.agents',
-                '.cursorrules',
-                '.cursorignore',
-                '.github/copilot-instructions.md'
-            ], base_path());
-
-            // Jalankan tanpa melempar error jika filenya memang belum pernah ter-track
-            $process->run();
+            $items = ['.docs', 'agents', '.agents', '.cursorrules', '.cursorignore', '.github/copilot-instructions.md'];
+            foreach ($items as $item) {
+                Process::fromShellCommandLine("git rm -r --cached {$item} 2>/dev/null", base_path())->run();
+            }
         }
 
         $this->info('✔ agents/ and .docs/ installed successfully.');
