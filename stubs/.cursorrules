@@ -2,11 +2,12 @@
 - Laser-focused Target Execution: Focus exclusively on files directly relevant to the reported issue or explicit instruction.
 - Zero Unprompted Exploration: Strictly avoid broad directory searches, globbing, or inspecting `vendor/`, `node_modules/`, or unrelated files.
 - Execute Directly: Go straight to the root of the issue without modifying unrequested code or initiating speculative refactors.
-- Demand-Driven Documentation: Never ingest the entire `.docs/` directory at once. Always route via `agents/agents.md` to load only the specific document required for the active task.
+- Demand-Driven Documentation: Never ingest the entire `.docs/` directory at once. Always route via `agents/agents.md`; load only the required rule and the exact canonical heading for the affected layer.
+- Canonical Template Granularity: Do not load all of `05-master-templates.md` for a single-layer task. Read only the matching section, such as `7.2. Repository Template` for repository work or `7.6` and `7.10` for an edit form.
 
 # TAA STARTERKIT ARCHITECTURE RULES
 - Strict SoC: Ultra-Thin Controller (only Yajra DT dataDt & downloads), Static Repository for all DB operations, Livewire for UI/forms ($form = []).
 - Views: Global templates in `resources/views/templates/`, module views in `resources/views/mods/`.
 - Routing & ATC: Index blade must wrap table container with wire:ignore. ATC script must handle DataTable destroy on re-init and listen to livewire:navigated.
 - Modal & DT Reload: Use hookModalDelete dispatching to universal modal; trigger reloadDT for reactive table refresh without page reload.
-- Always check `agents/agents.md` for specific architectural guidelines.
+- Always check `agents/agents.md` for task, domain, and layer routing before loading documentation or inspecting reference modules.
